@@ -1,0 +1,66 @@
+---
+import { getCollection } from 'astro:content'
+import MarkdownPostLayout from '../layouts/Layout.astro'
+import simpleGit from 'simple-git'
+
+// const path = import.meta.
+
+export async function getStaticPaths() {
+  const blogEntries = await getCollection('post')
+  return blogEntries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry }
+  }))
+}
+
+const git = simpleGit()
+async function gitInfo(filePath: string) {
+  return await git.log({ file: filePath })
+}
+
+// console.log(getLastCommitDate("/file.txt"));
+const formatDate = (date?: string) =>
+  date ? new Date(date).toISOString().substring(0, 10) : undefined
+const show = (input?: string) => input || 'not published'
+
+const { entry } = Astro.props
+const file = `${process.cwd()}/src/content/${entry.collection}/${entry.id}`
+const postGitInfo = await gitInfo(file)
+const creationDate = formatDate(postGitInfo.all.at(-1)?.date)
+const updatedDate = formatDate(postGitInfo.latest?.date)
+const commitHash = postGitInfo.latest?.hash
+
+const { Content } = await entry.render()
+---
+
+<MarkdownPostLayout title={entry.data.title}>
+  <h1
+    class="mb-6 before:absolute before:-translate-x-full before:whitespace-pre before:text-[#dd00ff] before:content-['#_']"
+  >
+    {entry.data.title}
+  </h1>
+  <div class='flex justify-between text-sm'>
+    <div class='flex justify-around leading-3'>
+      <div class='leading-3'>Tags:</div>
+      <!-- <div>Tags:</div> -->
+      <ul class='m-0 leading-3'>
+        {entry.data.tags.map((tag) => <li>{tag}</li>)}
+      </ul>
+    </div>
+    <ul class='m-0 leading-3'>
+      <li>Created: {show(creationDate)}</li>
+      <li>Updated: {show(updatedDate)}</li>
+      <li class='group relative'>
+        <a
+          href={`https://git.ni-verse.com/d0f/digital_garden/commit/${commitHash}`}
+          target='_blank'
+          class='absolute -translate-x-1/4 bg-black opacity-0 group-hover:opacity-100'
+          >{commitHash}</a
+        >
+         Commit: {show(commitHash?.substring(0, 8))}...
+      </li>
+    </ul>
+  </div>
+  <hr class='mb-10 mt-6' />
+  <Content />
+</MarkdownPostLayout>
