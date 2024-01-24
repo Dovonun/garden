@@ -13,7 +13,7 @@ export async function getStaticPaths() {
   }))
 }
 
-const git = simpleGit()
+const git = simpleGit({ baseDir: './src/content/blog' })
 async function gitInfo(filePath: string) {
   return await git.log({ file: filePath })
 }
