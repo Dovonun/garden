@@ -6,7 +6,7 @@ import simpleGit from 'simple-git'
 // const path = import.meta.
 
 export async function getStaticPaths() {
-  const blogEntries = await getCollection('post')
+  const blogEntries = await getCollection('blog')
   return blogEntries.map((entry) => ({
     params: { slug: entry.slug },
     props: { entry }
