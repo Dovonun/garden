@@ -10,5 +10,8 @@ export default defineConfig({
   site: 'https://dovonun.github.io',
   base: 'garden',
   integrations: [mdx(), tailwind()],
-  trailingSlash: "never"
+  trailingSlash: "never",
+  build: {
+    format: 'file'
+  }
 });
