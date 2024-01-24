@@ -20,6 +20,12 @@ jobs:
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          repository: 'dovonun/blog'
+          path: ./src/content/blog
+      - name: log pwd
+        run: pwd
       - name: Install, build, and upload your site
         uses: withastro/action@v1
         # with:
